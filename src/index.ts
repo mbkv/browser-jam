@@ -1,4 +1,4 @@
-import "./html/tokenizer"
+import { parse } from "./html"
 
 const defaultHtml = `<!DOCTYPE html>
 <html>
@@ -6,6 +6,8 @@ const defaultHtml = `<!DOCTYPE html>
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
+    <!-- test  -->
+    <? test >
     <h1 id="main-heading">Welcome to My Website</h1>
     <p class="paragraph">This is a paragraph.</p>
     <style>
@@ -26,10 +28,15 @@ const defaultHtml = `<!DOCTYPE html>
       }
     </style>
 </body>
-</html>`;
+</html>
+
+
+`;
 
 function main() {
   document.getElementById('inputhtml')!.textContent = defaultHtml
+
+  console.log(parse(defaultHtml).debug());
 }
 
 if (document.readyState === "loading") {
