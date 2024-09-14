@@ -390,13 +390,18 @@ function* tokenizer(input: string) {
 // end of compliance starts around here. I just start spitballing here writing
 // in disgusting hacks
 
-window.tokenizer = tokenizer;
-
 export class TextNode {
-  constructor(public text: string) {}
+  constructor(
+    public parent: Node,
+    public text: string,
+  ) {}
 
   get textContext() {
-    return this.text.replace(/\s+/g, ' ');
+    return this.text.replace(/\s+/g, " ");
+  }
+
+  hasParent(node: Node) {
+    return this.parent.hasParent(node);
   }
 
   debug() {
@@ -404,7 +409,7 @@ export class TextNode {
   }
 
   html(indent = 0) {
-    return ' '.repeat(indent) + this.textContext;
+    return " ".repeat(indent) + this.textContext;
   }
 }
 
@@ -422,17 +427,35 @@ export class Node implements INode {
     public parent: Node | undefined,
   ) {}
 
-  *getElementsByTagname(tagname: string): Generator<Node> {
+  hasParent(node: Node) {
+    let current: Node | undefined = this;
+    while (current) {
+      if (node === current) {
+        return true;
+      }
+      current = current.parent;
+    }
+
+    return false;
+  }
+
+  *visit(): Generator<Node | TextNode> {
     for (let i = 0; i < this.childNodes.length; i++) {
       const node = this.childNodes[i];
-      if (node instanceof Node) {
-        if (node.tag === tagname) {
-          yield node;
-        }
+      yield node;
 
-        for (const subnode of node.getElementsByTagname(tagname)) {
+      if (node instanceof Node) {
+        for (const subnode of node.visit()) {
           yield subnode;
         }
+      }
+    }
+  }
+
+  *getElementsByTagname(tagname: string): Generator<Node> {
+    for (const node of this.visit()) {
+      if (node instanceof Node && node.tag === tagname) {
+        yield node;
       }
     }
   }
@@ -446,8 +469,10 @@ export class Node implements INode {
   }
 
   html(indent = 0): string {
-    const nextLevelIndent = this.tag === '' ? indent : indent + 2;
-    const children = this.childNodes.map((node) => node.html(nextLevelIndent)).join("\n");
+    const nextLevelIndent = this.tag === "" ? indent : indent + 2;
+    const children = this.childNodes
+      .map((node) => node.html(nextLevelIndent))
+      .join("\n");
     if (this.tag === "") {
       return children;
     }
@@ -456,8 +481,8 @@ export class Node implements INode {
       attributes += " ";
       attributes += `${key}="${value}"`;
     }
-    const indentation = ' '.repeat(indent);
-    return `${indentation}<${this.tag}${attributes}>\n${children}\n${indentation}</${this.tag}>` ;
+    const indentation = " ".repeat(indent);
+    return `${indentation}<${this.tag}${attributes}>\n${children}\n${indentation}</${this.tag}>`;
   }
 }
 
@@ -498,10 +523,7 @@ const impliedEndTags = [
   "rtc",
 ];
 
-const generateImpliedEndTags = [
-  ...impliedEndTags,
-  "dl"
-]
+const generateImpliedEndTags = [...impliedEndTags, "dl"];
 
 export const parse = (input: string) => {
   const root = new Node("", {}, undefined);
@@ -525,9 +547,6 @@ export const parse = (input: string) => {
               break;
             }
             current = current.parent!;
-          }
-          if (current == null) {
-            console.error(`can't close ${token.name}`);
           }
         } else {
           if (generateImpliedEndTags.includes(token.name)) {
@@ -555,7 +574,7 @@ export const parse = (input: string) => {
         break;
       }
       case TokenEnum.character: {
-        const textnode = new TextNode("");
+        const textnode = new TextNode(node, "");
         while (i < tokens.length && tokens[i].type === TokenEnum.character) {
           textnode.text += (tokens[i] as CharacterToken).character;
           i += 1;
@@ -567,4 +586,3 @@ export const parse = (input: string) => {
   }
   return root;
 };
-window.parse = parse;

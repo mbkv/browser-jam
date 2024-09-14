@@ -7,8 +7,8 @@ export const isCharDigit = (string: string) => {
   const zero = "0".charCodeAt(0);
   const nine = "9".charCodeAt(0);
 
-    return (charCode >= zero && charCode <= nine)
-}
+  return charCode >= zero && charCode <= nine;
+};
 
 export const isCharAlpha = (string: string) => {
   const charCode = string.charCodeAt(0);
@@ -36,9 +36,12 @@ export const isCharHex = (string: string) => {
 
 export const isCharBase64 = (string: string) => {
   return (
-    isCharAlpha(string) || isCharDigit(string) || string[0] === '_' || string[0] === '-'
-  )
-}
+    isCharAlpha(string) ||
+    isCharDigit(string) ||
+    string[0] === "_" ||
+    string[0] === "-"
+  );
+};
 
 export class TokenizerContext<State> {
   returnState: State[] = [];
