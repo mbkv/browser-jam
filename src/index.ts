@@ -1,42 +1,40 @@
-import { parse } from "./html"
+import { Node, parse } from "./parser";
+import { render } from "./renderer";
 
-const defaultHtml = `<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body>
-    <!-- test  -->
-    <? test >
-    <h1 id="main-heading">Welcome to My Website</h1>
-    <p class="paragraph">This is a paragraph.</p>
-    <style>
-      body {
-          background-color: #f0f0f0;
-      }
+const PROXY_HOST = "http://localhost:8090"
 
-      #main-heading {
-          color: #333;
-          text-align: center;
-      }
+async function fetchPage(url: string) {
+  // gotta proxy due to cors errors
+  const proxied = `${PROXY_HOST}/${url}`;
+  const resp = await fetch(proxied);
+  const text = await resp.text();
 
-      .paragraph {
-          font-size: 20px;
-          font-family: Arial, sans-serif;
-          margin: 0 auto;
-          width: 50%;
-      }
-    </style>
-</body>
-</html>
+  return text;
+}
 
+function renderPage(html: string) {
+  const canvas = document.getElementById('canvas')! as HTMLCanvasElement;
+  const node = parse(html)
+}
 
-`;
+async function main() {
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  const htmlDisplay = document.getElementById('inputhtml') as HTMLTextAreaElement;
+  const addressBar = document.getElementById('address-bar')! as HTMLInputElement;
+  let text: string | undefined;
+  let html: Node | undefined;
 
-function main() {
-  document.getElementById('inputhtml')!.textContent = defaultHtml
+  async function run() {
+    text = await fetchPage(addressBar.value);
+    html = parse(text)
+    htmlDisplay.textContent = html.html();
 
-  console.log(parse(defaultHtml).debug());
+    const [body] = html.getElementsByTagname("body")
+    render(canvas, body);
+  }
+
+  addressBar.addEventListener('change', run)
+  run();
 }
 
 if (document.readyState === "loading") {

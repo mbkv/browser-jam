@@ -14,7 +14,11 @@
   },
   "scripts": {
     "start": "concurrently bun:start:*",
-    "start:tsc": "bun build src/index.ts --sourcemap --outdir public/ --watch",
+    "start:proxy": "bun run bin/proxy.ts",
+    "start:tsc": "bash ./build.sh",
     "start:serve": "serve public"
+  },
+  "dependencies": {
+    "cors-anywhere": "^0.4.4"
   }
 }

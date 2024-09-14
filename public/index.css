@@ -14,8 +14,16 @@ html, body, .root {
 
 .root {
     display: grid;
-    grid-template-rows: 1fr;
+    grid-template-rows: min-content 1fr;
     grid-template-columns: 1fr 1fr;
+}
+
+.address-bar {
+    grid-column: span 2;
+}
+
+.address-bar input {
+    width: 100%;
 }
 
 .input-container,
