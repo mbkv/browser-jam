@@ -1,7 +1,9 @@
 import { Node, parse } from "./parser";
 import { render } from "./renderer";
 
-const PROXY_HOST = "https://browser.mbkv.io/proxy";
+const PROXY_HOST = window.location.href.includes("localhost")
+  ? "http://localhost:8090"
+  : "https://browser.mbkv.io/proxy";
 
 async function fetchPage(url: string) {
   // gotta proxy due to cors errors
