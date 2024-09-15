@@ -2,7 +2,7 @@
 
 build() {
     echo 'building...'
-    bun build src/index.ts --sourcemap --outdir public/
+    bun build src/index.ts --sourcemap=external --outdir public
 }
 
 build
