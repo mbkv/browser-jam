@@ -46,6 +46,12 @@ async function main() {
     render(canvas, html);
   }
 
+  const observer = new ResizeObserver(() => {
+    run();
+  });
+  observer.observe(canvas.parentElement!);
+
+
   addressBar.addEventListener("blur", run);
   run();
 }
