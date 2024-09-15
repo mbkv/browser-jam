@@ -90,10 +90,6 @@ function* tokenizer(input: string) {
           if (char === "<") {
             s.setState(State.tagOpen);
             break;
-          } else if (char === "?") {
-            s.reconsume();
-            s.setState(State.bogusComment);
-            break;
           } else {
             yield generateCharacterToken(char);
           }

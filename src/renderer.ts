@@ -266,6 +266,7 @@ const drawText = (
 };
 
 export const render = (canvas: HTMLCanvasElement, body: Node) => {
+  const ratio = window.devicePixelRatio;
   const ctx = canvas.getContext("2d")!;
   const blocks = generateBlocks(body);
   const width = canvas.width;
@@ -279,9 +280,9 @@ export const render = (canvas: HTMLCanvasElement, body: Node) => {
       "margin-bottom": marginBottom,
       "margin-left": marginLeft,
     } = block.style;
-    const actualMarginTop = Math.max(marginTop ?? 0, previousMarginBottom);
+    const actualMarginTop = Math.max(marginTop ?? 0, previousMarginBottom) * ratio;
     y += actualMarginTop;
-    const actualMarginLeft = globalMargin + (marginLeft ?? 0);
+    const actualMarginLeft = (globalMargin + (marginLeft ?? 0)) * ratio;
 
     y = drawText(ctx, block.elements, width, actualMarginLeft, y);
     previousMarginBottom = marginBottom ?? 0;
